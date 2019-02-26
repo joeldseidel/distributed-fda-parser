@@ -18,6 +18,8 @@ public class AuthenticateClientHandler extends HandlerPrototype implements HttpH
             long verificationKey = requestParams.getLong("verification_key");
             //Attach the client to as an authenticated worker
             SessionInstanceManager.attachClient(verificationKey);
+            //Debug output statement
+            System.out.println("New worker client attached");
             //Return the validated verification as a the response
             this.response = Long.toString(verificationKey);
         } else {

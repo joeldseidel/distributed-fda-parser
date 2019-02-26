@@ -34,6 +34,9 @@ public class FDAParseServer {
         }
         //Set key for this session
         SessionInstanceManager.generateSessionKey();
+        //Generate the session code for the user connections
+        String sessionCode = SessionInstanceManager.generateSessionCode();
+        System.out.println("The code for this session is: " + sessionCode);
         return true;
     }
 
