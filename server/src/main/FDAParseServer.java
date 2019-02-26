@@ -5,6 +5,7 @@ import main.Handlers.AuthenticateClientHandler;
 import main.Handlers.ErrorReportHandler;
 import main.Handlers.TaskReportHandler;
 import main.Handlers.TaskRequestHandler;
+import main.Managers.FDADataManager;
 import main.Managers.SessionInstanceManager;
 
 import java.io.BufferedReader;
@@ -34,6 +35,11 @@ public class FDAParseServer {
         }
         //Set key for this session
         SessionInstanceManager.generateSessionKey();
+        //Get the file urls that need to be parsed
+        if(!FDADataManager.fetchAvailableFiles()){
+            System.out.println("Could not get the FDA files");
+            return false;
+        }
         //Generate the session code for the user connections
         String sessionCode = SessionInstanceManager.generateSessionCode();
         System.out.println("The code for this session is: " + sessionCode);
@@ -55,6 +61,7 @@ public class FDAParseServer {
             //Client needs to report an error
             //This handler will handle if a client fails to complete its task for some reason
             server.createContext("/report_error", new ErrorReportHandler());
+            server.start();
         } catch (IOException ioEx) {
             ioEx.printStackTrace();
         }
