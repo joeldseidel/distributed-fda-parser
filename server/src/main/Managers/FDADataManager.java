@@ -62,4 +62,8 @@ public class FDADataManager {
         }
         return true;
     }
+
+    public static String getNextFile() throws InterruptedException{
+        return fileQueue.take();
+    }
 }

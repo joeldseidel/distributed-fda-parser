@@ -52,4 +52,13 @@ public class SessionInstanceManager {
         //Calculate user check sum and add to attached client check sum list
         workerCheckSums.add(sessionKey - verificationKey);
     }
+
+    /**
+     * Determine if client has been attached to the session
+     * @param verificationKey verification key of the connecting client
+     * @return if client is attached or not
+     */
+    public static boolean isAttachedClient(long verificationKey) {
+        return workerCheckSums.contains(sessionKey - verificationKey);
+    }
 }
