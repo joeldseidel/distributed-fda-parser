@@ -69,3 +69,7 @@ server/.idea/misc.xml
 server/.idea/modules.xml
 server/.idea/workspace.xml
 server/FDAParseServer.iml
+client/.idea/misc.xml
+client/.idea/modules.xml
+client/.idea/workspace.xml
+client/client.iml
