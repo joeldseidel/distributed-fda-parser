@@ -53,6 +53,13 @@ public class ParsingClient {
     }
 
     private static void initWorker(ServerConnection conn) {
-        String[] workFilesUrls = conn.getWorkFileUrls(Runtime.getRuntime().availableProcessors());
+        //Get available processors - benchmark for how many tasks we can do at one time
+        int availableCores = Runtime.getRuntime().availableProcessors();
+        //Get the array of files from the server with the available number of threads
+        String[] workFilesUrls = conn.getWorkFileUrls(availableCores);
+        //Create worker object instance
+        ParseWorker parseWorker = new ParseWorker(availableCores, workFilesUrls);
+        //Invoke work to start
+        parseWorker.doWork();
     }
 }
