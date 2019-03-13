@@ -4,7 +4,6 @@ import org.json.JSONObject;
 
 import java.io.*;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -14,25 +13,16 @@ public class ServerConnection {
     private long verificationKey;
 
     public ServerConnection(String url, String sessionCode){
-        this.url = url;
+        this.url = "http://" + url + ":6699/authenticate_client";
         this.sessionCode = sessionCode;
         this.verificationKey = ThreadLocalRandom.current().nextLong();
     }
 
     /**
-     * Connect to a session - perform handshake and request work
-     */
-    public void createSessionConnection(){
-        if(isSuccessfulHandshake()){
-            //TODO: implement requesting work
-        }
-    }
-
-    /**
      * Perform handshake operations and determine validity
-     * @return validity of the handhshake operation
+     * @return validity of the handshake operation
      */
-    private boolean isSuccessfulHandshake(){
+    public boolean isSuccessfulHandshake(){
         String handshakeArgs = getHandshakeArgumentObject().toString();
         HttpURLConnection connection = createConnection(handshakeArgs.length());
         sendRequest(connection, handshakeArgs);
