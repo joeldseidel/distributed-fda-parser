@@ -21,10 +21,10 @@ public class AuthenticateClientHandler extends HandlerPrototype implements HttpH
             //Debug output statement
             System.out.println("New worker client attached");
             //Return the validated verification as a the response
-            this.response = Long.toString(verificationKey);
+            this.response = new JSONObject().put("response", Long.toString(verificationKey)).toString();
         } else {
             //Session code was invalid
-            this.response = "invalid client handshake";
+            this.response = new JSONObject().put("response", "invalid client handshake").toString();
         }
     }
 }
