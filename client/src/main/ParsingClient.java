@@ -8,10 +8,11 @@ import java.io.InputStreamReader;
 public class ParsingClient {
     public static void main(String args[]){
         //Attempt to connect with the server
-        ServerConnection conn = connectToSession();
-        if(conn != null){
-            //TODO: this
-        }
+        ServerConnection conn;
+        do {
+            conn = connectToSession();
+        } while(conn == null);
+        initWorker(conn);
     }
 
     /**
@@ -49,5 +50,9 @@ public class ParsingClient {
         } else {
             return null;
         }
+    }
+
+    private static void initWorker(ServerConnection conn) {
+        String[] workFilesUrls = conn.getWorkFileUrls(Runtime.getRuntime().availableProcessors());
     }
 }

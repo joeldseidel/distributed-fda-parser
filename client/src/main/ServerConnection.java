@@ -1,5 +1,6 @@
 package main;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.*;
@@ -13,7 +14,7 @@ public class ServerConnection {
     private long verificationKey;
 
     public ServerConnection(String url, String sessionCode){
-        this.url = "http://" + url + ":6699/authenticate_client";
+        this.url = "http://" + url + ":6699";
         this.sessionCode = sessionCode;
         this.verificationKey = ThreadLocalRandom.current().nextLong();
     }
@@ -23,11 +24,40 @@ public class ServerConnection {
      * @return validity of the handshake operation
      */
     public boolean isSuccessfulHandshake(){
+        //Get argument object to send with handshake request
         String handshakeArgs = getHandshakeArgumentObject().toString();
-        HttpURLConnection connection = createConnection(handshakeArgs.length());
+        //Create connection object from authenticate user path with argument object string length
+        HttpURLConnection connection = createConnection("/authenticate_client", handshakeArgs.length());
+        //Send the request to the server
         sendRequest(connection, handshakeArgs);
+        //Get the response object from the server
         JSONObject handshakeResponse = getResponse(connection);
+        //Return validity of the handshake - determined from response object
         return handshakeResponse.getString("response").equals(Long.toString(this.verificationKey));
+    }
+
+    /**
+     * Get a specified number of files from the server distribution module
+     * @param coreCount amount of files to request - the number of files that can be parsed at one time
+     * @return a string array containing the urls of the requested files
+     */
+    public String[] getWorkFileUrls(int coreCount){
+        //Get argument object to send with request work args
+        String requestWorkArgs = getRequestWorkArgumentObject(coreCount).toString();
+        //Create connection object from request work path with argument object string length
+        HttpURLConnection conn = createConnection("/request_task", requestWorkArgs.length());
+        //Send the request to the server
+        sendRequest(conn, requestWorkArgs);
+        //Get the response object from the server
+        JSONObject requestWorkResponse = getResponse(conn);
+        //Get the file json array - this contains the requested files on which to do work
+        JSONArray requestedWorkArray = requestWorkResponse.getJSONArray("files");
+        //Get the requested file urls and move into string array
+        String[] workFileUrls = new String[requestedWorkArray.length()];
+        for(int i = 0; i < requestedWorkArray.length(); i++) {
+            workFileUrls[i] = requestedWorkArray.getString(i);
+        }
+        return workFileUrls;
     }
 
     /**
@@ -44,15 +74,29 @@ public class ServerConnection {
     }
 
     /**
+     * Get the arugmetns to send with the request work request
+     * @param coreCount number of work to request in this request
+     * @return JSON object containing the request work request arguments
+     */
+    private JSONObject getRequestWorkArgumentObject(int coreCount){
+        //Create request work arguments object
+        JSONObject requestWorkArgs = new JSONObject();
+        //Append the request work argument properties to the object
+        requestWorkArgs.put("verification_key", this.verificationKey);
+        requestWorkArgs.put("request_count", coreCount);
+        return requestWorkArgs;
+    }
+
+    /**
      * Create HTTP connection to the specified server url
      * @param contentLength length of the content to be sent to the server
      * @return an http connection object
      */
-    private HttpURLConnection createConnection(int contentLength){
+    private HttpURLConnection createConnection(String urlPath, int contentLength){
         HttpURLConnection connection = null;
         try {
             //Open connection to specified url
-            URL url = new URL(this.url);
+            URL url = new URL(this.url + urlPath);
             connection = (HttpURLConnection) url.openConnection();
             //Define the arguments of the connection header
             connection.setRequestMethod("POST");
